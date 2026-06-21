@@ -1,0 +1,29 @@
+# 环境变量与密钥文件
+.env
+.env.local
+.env.*.local
+*.env
+
+# 本地覆盖配置（含真实密钥的本地版本）
+opencode.local.jsonc
+opencode.local.json
+*.local.jsonc
+*.local.json
+
+# opencode 运行时产物
+.opencode/
+
+# 操作系统
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# 编辑器 / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 日志
+*.log
