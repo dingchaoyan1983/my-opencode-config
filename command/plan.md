@@ -4,7 +4,9 @@ description: 生成任务计划文档，保存到当前项目 .opencode/plan/ �
 
 生成任务计划文档，并保存为 `.md` 文件到当前项目根目录下的 `.opencode/plan/` 目录。
 
-**输入**：`$ARGUMENTS` 是用户的需求描述。如果为空，使用 **question 工具**（开放式，无预设选项）询问用户：
+**输入**：`$ARGUMENTS` 是用户的需求描述。
+- 如果 `$ARGUMENTS` 为 `list` 或 `ls`，使用 **read 工具**读取 `.opencode/plan/` 目录并列出所有 `.md` 文件，然后停止
+- 如果为空，使用 **question 工具**（开放式，无预设选项）询问用户：
 
 > "你想规划什么任务？描述你想要实现或修改的内容。"
 
@@ -57,8 +59,7 @@ const path = require('path');
 
 <对于关键参数/配置项，用列表说明其来源依据：>
 
-- `<参数名>` -- <来源说明，如"来自 module-federation.config.js 中的定义">
-- `<参数名>` -- <来源说明，如"来自 webpack.config.js 中的 publicPath">
+- `<参数名>` -- 来自 <来源文件> 中的 <具体位置/定义>。如：`port: 3004` 来自 `module-federation.config.js` 中的 `devServer.port`
 
 ## Task 2: <任务简述>
 
@@ -71,8 +72,20 @@ const path = require('path');
 
 ### 4. 保存文件
 
-- 确保当前项目根目录下存在 `.opencode/plan/` 目录（不存在则用 bash 工具创建：`New-Item -ItemType Directory -Path ".opencode\plan" -Force`，`workdir` 设为项目根目录）
+- 确保当前项目根目录下存在 `.opencode/plan/` 目录（不存在则用 bash 工具创建：`mkdir -p .opencode/plan`，`workdir` 设为项目根目录）。此命令通过 opencode 的 bash 工具执行（走 POSIX shell），在 macOS/Linux/Windows（Git Bash/WSL）下均兼容
+- 如果 `.opencode/plan/` 目录下已存在同名 `.md` 文件，使用 **question 工具**（是/否）询问用户是否覆盖；用户选择"否"则停止
 - 使用 **write 工具**将 plan 内容写入 `.opencode/plan/YYYY-MM-DD-<task-name>.md`（绝对路径，基于当前项目根目录）
+
+### 4.5 校验 plan 格式
+
+保存完成后，使用 **read 工具**重新读取刚写入的 plan 文件，检查是否包含：
+
+- 一级标题 `# `（第 1 行应为标题）
+- `## 现状` 章节
+- 至少一个 `## Task N:` 章节（N 从 1 递增）
+- 代码块均带有语言标记（\`\`\`js、\`\`\`json、\`\`\`tsx、\`\`\`bash 等）
+
+如校验发现缺失上述任一要素，输出警告信息并提示用户手动编辑 plan 文件补充。
 
 ### 5. 输出摘要
 
@@ -92,7 +105,9 @@ const path = require('path');
 2. **必含 `## 现状` 章节**：紧跟标题之后，描述背景与现状
 3. **分任务用 `## Task N: <描述>`**：N 从 1 递增，每个任务一个二级标题
 4. **代码示例带语言标记**：```js、```json、```tsx、```bash 等，不要用无标记代码块
-5. **关键参数说明来源**：用 `- \`参数名\` -- <来源>` 列表项，让用户知道每个值从哪来
+5. **关键参数说明来源和预期值**：用 `- \`参数名\` -- 来自 <来源文件> 中的 <具体位置/定义>` 格式列出。例如：
+   - `port: 3004` -- 来自 `module-federation.config.js` 中的 `devServer.port` 定义
+   - `appBuildPublicPath: "/child/admin"` -- 来自 `webpack.config.js` 中的 `output.publicPath`
 6. **不执行任何业务代码改动**：本命令只生成 plan 文档，不修改项目源码、配置、Git 状态
 7. **基于真实探索**：plan 中的文件路径、函数名、配置项必须来自第 1 步的只读探索，不要凭空编造
 
@@ -100,69 +115,67 @@ const path = require('path');
 
 ## 参考示例
 
-用户输入 `/plan 为 admin 包补充 start:prod 生产启动命令`，生成的 plan 文件 `2026-06-21-admin-start-prod.md` 应类似：
+用户输入 `/plan 为 user-service 补充健康检查端点`，生成的 plan 文件 `2026-07-07-user-service-health-check.md` 应类似：
 
 ```markdown
-# 为 admin 包补充 start:prod 生产启动命令
+# 为 user-service 补充健康检查端点
 
 ## 现状
 
-`packages/admin` 是 `packages/` 目录下唯一缺少 `start:prod` 脚本的包，同时缺少 `config.js` 和 `service.js`。
+`user-service` 是一个基于 gRPC 的微服务，当前缺少 `/healthz` 健康检查端点，导致 K8s 探针无法检测服务状态。同仓库中的 `order-service` 已实现了健康检查，可作为对标参考。
 
-## Task 1: 创建 `packages/admin/config.js`
+## Task 1: 在 `user-service` 中新增健康检查端点
 
-参照 `packages/user/config.js` 的模式，创建配置文件：
+参照 `order-service/internal/health/check.go` 的实现模式，在 `user-service/internal/handler/health.go` 中新增健康检查函数：
 
-```js
-const path = require('path');
-const fs = require('fs');
+```go
+package handler
 
-const appDirectory = fs.realpathSync(process.cwd());
-const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
+import (
+	"context"
+	"google.golang.org/grpc/health/grpc_health_v1"
+)
 
-module.exports = {
-  appBuildPublicPath: "/child/admin",
-  appBuild: resolveApp(resolveApp("dist")),
-  port: 3004
+type HealthHandler struct{}
+
+func (h *HealthHandler) Check(ctx context.Context, req *grpc_health_v1.HealthCheckRequest) (*grpc_health_v1.HealthCheckResponse, error) {
+	return &grpc_health_v1.HealthCheckResponse{
+		Status: grpc_health_v1.HealthCheckResponse_SERVING,
+	}, nil
 }
 ```
 
-- `port: 3004` -- 来自 `module-federation.config.js` 中的定义
-- `appBuildPublicPath: "/child/admin"` -- 来自 `webpack.config.js` 中的 `publicPath`
+- `grpc_health_v1.HealthCheckResponse_SERVING` -- 来自 `order-service/internal/health/check.go` 中使用的状态常量
+- 包路径 `user-service/internal/handler/` -- 与 `order-service/internal/health/` 保持同一层级风格
 
-## Task 2: 创建 `packages/admin/service.js`
+## Task 2: 注册健康检查路由到 gRPC 服务
 
-与 `packages/user/service.js` 完全相同的 Express 静态服务：
+在 `user-service/cmd/main.go` 中注册 HealthHandler：
 
-```js
-const express = require('express');
-const path = require('path');
-const config = require('./config');
+```go
+import (
+	"user-service/internal/handler"
+	"google.golang.org/grpc/health/grpc_health_v1"
+)
 
-const app = express();
-app.use('*', function (req, res, next) {
-  next();
-});
-
-app.use(config.appBuildPublicPath, express.static(config.appBuild));
-
-app.get('/*', function (req, res) {
-  res.sendFile(path.join(config.appBuild, 'index.html'));
-});
-app.listen(config.port, () => console.log(`app listening at http://localhost:${config.port}`));
+func main() {
+	// ... 现有 gRPC 服务初始化代码 ...
+	healthHandler := &handler.HealthHandler{}
+	grpc_health_v1.RegisterHealthServer(grpcServer, healthHandler)
+}
 ```
 
-## Task 3: 修改 `packages/admin/package.json`
+- `grpc_health_v1.RegisterHealthServer` -- gRPC 标准库提供的注册函数，参照 `order-service/cmd/main.go` 中的用法
 
-1. 在 `scripts` 中添加 `start:prod`：
-   ```json
-   "start:prod": "node ./service.js"
-   ```
+## Task 3: 验证健康检查
 
-2. 在 `devDependencies` 中添加 `express` 依赖（与其他子应用一致，使用 `4.18.2`）：
-   ```json
-   "express": "4.18.2"
-   ```
+启动服务后执行：
+
+```bash
+grpc_health_probe -addr=localhost:50051
+```
+
+预期输出 `SERVING`，否则说明端点注册失败。
 ```
 
 ---
