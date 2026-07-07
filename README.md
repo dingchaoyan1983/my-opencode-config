@@ -9,7 +9,8 @@
 ├── AGENTS.md            # 全局指令：默认使用简体中文交流
 ├── command/
 │   ├── plan.md          # /plan 命令：生成任务计划文档到 .opencode/plan/
-│   └── run.md           # /run 命令：执行 plan 文件中定义的各个 Task
+│   ├── run.md           # /run 命令：执行 plan 文件中定义的各个 Task
+│   └── update-plan.md   # /update-plan 命令：迭代修改已生成的 plan 文档
 └── opencode.jsonc       # opencode 配置（provider 与模型定义，本地使用，见下文说明）
 ```
 
@@ -22,6 +23,10 @@
 ### /run
 
 执行 `/plan` 生成的计划文件中定义的各个 Task，按顺序完成代码改动并验证。详见 `command/run.md`。
+
+### /update-plan
+
+读取并修改 `.opencode/plan/` 下已生成的 plan 文档，支持多轮迭代修改，每次改动后展示变更并等待用户确认。详见 `command/update-plan.md`。
 
 ## Provider 配置
 
@@ -52,7 +57,7 @@
 
 1. 将本仓库内容放到 opencode 的配置目录（如 `~/.config/opencode/`）或项目 `.opencode/` 目录下。
 2. 设置环境变量 `API_KEY`（火山引擎 ARK API Key）后再启动 opencode。
-3. 在 opencode 中使用 `/plan` 规划任务，用 `/run` 执行计划。
+3. 在 opencode 中使用 `/plan` 规划任务，用 `/run` 执行计划，用 `/update-plan` 调整已生成的 plan。
 
 ## 安全说明
 
