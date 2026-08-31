@@ -1,89 +1,12 @@
 ---
-description: 迭代修改 .opencode/plan/ 下的 plan 文档，基于用户对话提示更新内容
+description: Revise an existing implementation plan according to the user's feedback.
+agent: plan
 ---
 
-读取 `.opencode/plan/` 下指定的 plan 文档，理解其内容，然后根据用户的自然语言提示进行迭代修改。
+Use the `update-plan` skill to handle this request.
 
-**输入**：`$ARGUMENTS` 是 plan 文件的路径或文件名 + 可选的修改需求。
-- 解析方式与 `/run` 一致：
-  - 绝对路径 → 直接使用
-  - 相对路径 → 相对于当前项目根目录解析
-  - 仅文件名（如 `2026-07-07-admin-start-prod.md`）→ 在 `.opencode/plan/` 目录下查找，自动补全 `.md` 后缀
-  - 为空 → 优先使用**当前对话中最近一次生成或引用的 plan 文件**（如本会话中最近执行 `/plan` 生成的文件、或对话中最近提到路径的 plan 文件）；若当前对话中未出现过任何 plan 文件，再用 **read 工具**读取当前项目 `.opencode/plan/` 目录，用 **question 工具**列出其中所有 `.md` 文件供用户选择；如果目录不存在或为空，提示用户先使用 `/plan` 命令生成计划，然后停止
-- `$ARGUMENTS` 中文件名之后的剩余文本作为首次修改需求（可选）
+Pass the user's input to the skill unchanged:
 
-在确定要修改的 plan 文件前不要继续。
+$ARGUMENTS
 
----
-
-## 执行流程
-
-### 1. 定位 plan 文件
-
-按以下顺序解析 `$ARGUMENTS`：
-
-- 绝对路径 → 直接使用
-- 相对路径 → 相对于当前项目根目录解析
-- 仅文件名（如 `2026-07-07-admin-start-prod.md` 或 `2026-07-07-admin-start-prod`）→ 在 `.opencode/plan/` 目录下查找，自动补全 `.md` 后缀
-- 为空 → 优先使用**当前对话中最近一次生成或引用的 plan 文件**（如本会话中最近 `/plan` 生成的文件、或对话中最近提到路径的 plan 文件）；若当前对话中未出现过任何 plan 文件，再用 **read 工具**读取 `.opencode/plan/` 目录，用 **question 工具**列出所有 plan 文件让用户选择
-
-定位失败时停止并提示用户。
-
-### 2. 读取并理解 plan 文件
-
-使用 **read 工具**读取选定的 plan 文件完整内容。
-
-在对话中输出当前 plan 文件的概要：
-- 文件名与路径
-- 一级标题
-- 现状章节要点
-- Task 列表（编号 + 描述）
-- 总行数
-
-让用户确认模型已理解当前内容。
-
-### 3. 获取修改需求
-
-- 如果 `$ARGUMENTS` 中包含文件名后的剩余文本，将其作为首次修改需求
-- 使用 **question 工具**（开放式）询问用户："你要对这个 plan 做什么修改？"
-- 每次修改完成后，再次询问用户是否还有更多修改，支持多轮迭代
-
-### 4. 执行修改
-
-对每个修改需求：
-
-1. **定位改动点**：基于第 2 步读取的内容，确定需要修改的文件位置（哪个 Task、哪段代码块、哪个参数来源列表）
-2. **重新读取**：执行修改前再次用 **read 工具**读取当前文件内容，确保基于最新状态操作
-3. **执行改动**：使用 **edit 工具**做精确字符串替换
-4. **展示变更**：输出本次改动的摘要（修改位置、变更要点）
-5. **用户确认**：使用 **question 工具**（是/否）询问用户"改动是否正确？是否继续修改？"
-   - 是 → 进入下一轮修改或结束
-   - 否 → 使用 **edit 工具**撤销本次改动（将新内容还原为旧内容），回到修改前状态
-
-### 5. 汇总
-
-全部修改完成后：
-
-- 输出最终 plan 文件的概要结构（标题、Task 列表）
-- 列出本次会话中所有已执行的修改
-- 提示用户：可再用 `/run` 执行修改后的 plan，或手动提交 Git
-
----
-
-## 格式约束
-
-1. **只修改 `.opencode/plan/` 下的 plan 文件**：本命令不修改项目中的其他文件
-2. **每次修改后等待用户确认**：未经用户确认不得继续下一次修改
-3. **支持撤销**：用户对某次修改不满意时，能回退到该次修改前的状态
-4. **保持 plan 文件格式一致**：修改后的内容必须遵循 plan 文档的 Markdown 结构（`# 标题` → `## 现状` → `## Task N:`）
-5. **不自动提交 Git**：所有改动由用户手动提交
-
----
-
-## 行为准则
-
-- 每次修改前重新读取 plan 文件确认当前内容（防止并发修改导致状态不一致）
-- 修改时使用精确匹配的 oldString，避免误改
-- 如果用户需求模糊，先通过 question 工具澄清再执行修改
-- 不擅自优化或重构未提及的部分
-- 修改完成后建议用户再用 `/run` 验证 plan 的可执行性
+Follow the skill's workflow and constraints exactly, including identifying the plan file, rereading it before each revision, and waiting for confirmation after every revision.

@@ -1,29 +1,29 @@
-# 全局语言指令
+# Global Language Instructions
 
-## 默认语言：中文（简体）
+## Default Language: Simplified Chinese
 
-无论用户使用什么语言提问，请**始终使用简体中文**与用户交流，包括：
+Regardless of the language used by the user, **always communicate with the user in Simplified Chinese**, including:
 
-- 所有解释、说明、分析、总结、建议
-- 工具调用前后的描述性文字
-- 错误说明和澄清问题
-- 任务完成后的汇报和摘要
+- All explanations, instructions, analyses, summaries, and suggestions
+- Descriptive text before and after tool calls
+- Error explanations and clarification questions
+- Completion reports and summaries
 
-## 例外情况（保持原文/英文）
+## Exceptions (Preserve the Original Language or English)
 
-以下内容**不要**翻译为中文，应遵循项目惯例或保留原始语言：
+The following content **must not be translated into Chinese**; follow project conventions or preserve the original language:
 
-- 代码本身（变量名、函数名、类型等）
-- 代码注释：遵循项目现有注释语言惯例（项目用英文则用英文，项目用中文则用中文）
-- Git 提交信息：遵循项目现有提交历史的语言风格
-- 文件名、路径、命令、API 名称等技术标识符
-- 引用的错误日志、命令输出原文
-- 项目文档（README、AGENTS.md 等）：遵循项目现有语言
+- The code itself (variable names, function names, types, and so on)
+- Code comments: follow the language convention already used by the project (use English if the project uses English; use Chinese if the project uses Chinese)
+- Git commit messages: follow the language style of the existing commit history
+- Technical identifiers such as file names, paths, commands, and API names
+- Quoted error logs and original command output
+- Project documentation (such as README and AGENTS.md): follow the language already used by the project
 
-## 思考过程
+## Reasoning Process
 
-在内部推理时也优先使用中文进行思考，使思路链与最终回复语言一致。
+During internal reasoning, also prioritize thinking in Chinese so that the reasoning process is consistent with the final response language.
 
-## 简洁性
+## Conciseness
 
-保持原有的简洁原则——用中文回答时同样要避免冗余的开场白和结尾语，直接给出答案。
+Maintain the existing principle of conciseness: when responding in Chinese, avoid redundant opening and closing remarks as well, and provide the answer directly.
