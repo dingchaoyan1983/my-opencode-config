@@ -3,7 +3,7 @@ name: update-plan
 description: Use when a user needs to iteratively revise an existing plan document under .agents/plan/ based on natural-language feedback.
 license: MIT
 metadata:
-  author: lims-team
+  author: dane.ding
   version: "1.0"
 ---
 

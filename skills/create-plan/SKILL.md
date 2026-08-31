@@ -3,7 +3,7 @@ name: create-plan
 description: Use when a user needs a project task broken down into an actionable implementation plan saved under .agents/plan/.
 license: MIT
 metadata:
-  author: lims-team
+  author: dane.ding
   version: "1.0"
 ---
 # Plan

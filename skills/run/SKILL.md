@@ -3,7 +3,7 @@ name: run
 description: Use when a user explicitly wants to execute an existing implementation plan and apply its tasks in order with verification.
 license: MIT
 metadata:
-  author: lims-team
+  author: dane.ding
   version: "1.0"
 ---
 

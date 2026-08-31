@@ -1,6 +1,6 @@
 ---
 description: Clarify an unclear implementation request and produce an approved execution plan before coding.
-agent: plan
+agent: build
 ---
 
 Use the `grill-with-plan` skill to handle this request.

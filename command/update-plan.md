@@ -1,6 +1,6 @@
 ---
 description: Revise an existing implementation plan according to the user's feedback.
-agent: plan
+agent: build
 ---
 
 Use the `update-plan` skill to handle this request.
