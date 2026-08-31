@@ -4,7 +4,7 @@ description: Use when a user needs a project task broken down into an actionable
 license: MIT
 metadata:
   author: dane.ding
-  version: "1.0"
+  version: "1.1"
 ---
 # Plan
 
@@ -12,7 +12,7 @@ Generate a task plan document and save it as a `.md` file under `.agents/plan/` 
 
 **Input**: The user's requirement description.
 
-- If the user's input is `list` or `ls`, use `list_dir` to read `.agents/plan/`, list all `.md` files, and stop.
+- If the user's input is `list` or `ls`, use the `read` tool on `.agents/plan/` (or `bash ls`) to list all `.md` files, and stop.
 - If the input is empty, use `question` tool (open-ended, with no predefined options) to ask:
 
 > "What task would you like to plan? Describe what you want to implement or modify."
@@ -25,7 +25,7 @@ Do not continue until the requirement is understood.
 
 ### 1. Read-only exploration (do not write application code)
 
-Use read-only tools such as `file_search`, `grep_search`, and `read_file` to investigate code, configuration, and documentation related to the requirement. Understand:
+Use read-only tools such as `glob`, `grep`, and `read` to investigate code, configuration, and documentation related to the requirement. Understand:
 
 - The current project structure and technology stack.
 - The relevant existing files, contents, patterns, and conventions.
@@ -82,13 +82,19 @@ const path = require('path');
 
 ### 4. Save the file
 
-- Ensure that `.agents/plan/` exists under the current project root. If it does not exist, use `run_in_terminal` to create it: `mkdir -p .opencode/plan`.
-- If a file with the same `.md` name already exists under `.agents/plan/`, use `question` tool (yes/no) to ask whether to overwrite it. Stop if the user selects "no".
-- Use `create_file` to write the plan to `.agents/plan/YYYY-MM-DD-<task-name>.md` using an absolute path based on the current project root.
+- Ensure that `.agents/plan/` exists under the current project root, creating it if needed. The command depends on the shell opencode runs (`shell` config in `opencode.json`):
+  - POSIX shells (bash/zsh, default on macOS/Linux): run `mkdir -p .agents/plan`.
+  - PowerShell on Windows: run `New-Item -ItemType Directory -Path .agents/plan -Force` (equals `mkdir -p`: creates all missing parents and does not error when the directory already exists; plain `mkdir` also works in PowerShell as an alias of `New-Item`, but `New-Item ... -Force` is the explicit, version-safe form).
+- If a file with the same `.md` name already exists under `.agents/plan/`, use the `question` tool (yes/no) to ask whether to overwrite it. Stop if the user selects "no".
+- **Write the plan in multiple small tool calls. Never write the whole document in one `write` call**: a single oversized tool-call payload frequently gets truncated mid-JSON, surfacing as `Invalid input for tool write: JSON parsing failed: Unterminated string`. Follow this sequence:
+  1. First use `write` to create the file with the skeleton only: the `#` title, the `## Current State` section with its text, and every `## Task N:` heading with a one-line placeholder describing that task.
+  2. Then use `edit` to replace each placeholder with that section's full content, one task at a time.
+  3. Keep every single `write`/`edit` call well under roughly 10 KB of content; if a section (e.g. a large code block) is long, split it across several `edit` calls.
+- The target file is `.agents/plan/YYYY-MM-DD-<task-name>.md`, using an absolute path based on the current project root.
 
 ### 5. Validate the plan format
 
-After saving, use `read_file` to reread the plan and check that it contains:
+After saving, use the `read` tool to reread the plan and check that it contains:
 
 - A level-one heading `# `, with the heading on line 1.
 - A `## Current State` section.

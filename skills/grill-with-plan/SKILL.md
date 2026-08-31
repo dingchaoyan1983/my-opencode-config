@@ -1,6 +1,10 @@
 ---
 name: grill-with-plan
 description: Use when a user has an unclear plan, design, or implementation request and needs its assumptions, tradeoffs, and execution scope clarified before coding.
+license: MIT
+metadata:
+  author: dane.ding
+  version: "1.0"
 ---
 
 # Grill With Plan
@@ -32,7 +36,7 @@ Use this skill to turn an unclear idea, design, or implementation request into a
 - Do not write or modify application code during the planning phase except for creating or updating the plan document itself.
 - **Do not run the plan automatically after creating it — never.** The `run` skill may only be invoked in response to an explicit user execution command in a later turn.
 - End your turn immediately after presenting the plan and the confirmation prompt. Do not call `run`, do not start editing files, do not call any tool that would start executing the plan.
-- Wait for an explicit user confirmation — e.g. "confirm", "execute", "start", "go ahead", "follow this plan", "run it", or "go ahead" — before calling `run`. The user must be agreeing to EXECUTE, not merely acknowledging the plan.
+- Wait for an explicit user confirmation — e.g. "confirm", "execute", "start", "go ahead", "follow this plan", or "run it" — before calling `run`. The user must be agreeing to EXECUTE, not merely acknowledging the plan.
 - If the user's reply is review-only or ambiguous ("I'll take a look", "wait", "I have an objection", "okay", or "understood"), do NOT execute. Ask again for explicit confirmation.
 - If the user changes requirements while reviewing the plan, update the plan first, then ask for confirmation again.
 - If the user asks to skip grilling, use `create-plan` directly instead of this skill.

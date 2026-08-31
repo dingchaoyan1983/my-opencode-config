@@ -4,7 +4,7 @@ description: Use when a user needs to iteratively revise an existing plan docume
 license: MIT
 metadata:
   author: dane.ding
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Update Plan
@@ -16,7 +16,7 @@ Read the specified plan document under `.agents/plan/`, understand its contents,
   - Absolute path -> use it directly.
   - Relative path -> resolve it relative to the current project root.
   - File name only, such as `2026-07-24-admin-start-prod.md` -> look under `.agents/plan/` and append `.md` automatically.
-  - Empty -> prefer the **most recently generated or referenced plan file in the current conversation**. If no plan file has appeared in the conversation, use `list_dir` to read `.agents/plan/` and `question` tool to let the user choose from its `.md` files. If the directory does not exist or is empty, tell the user to generate a plan with the `plan` skill first, then stop.
+  - Empty -> prefer the **most recently generated or referenced plan file in the current conversation**. If no plan file has appeared in the conversation, use the `read` tool (or `bash ls`) to list `.agents/plan/` and `question` tool to let the user choose from its `.md` files. If the directory does not exist or is empty, tell the user to generate a plan with the `create-plan` skill first, then stop.
 - Treat the remaining text after the file name as the initial revision request, if present.
 
 Do not continue until the plan file to modify is identified.
@@ -32,13 +32,13 @@ Parse the input in this order:
 - Absolute path -> use it directly.
 - Relative path -> resolve it relative to the current project root.
 - File name only, such as `2026-07-24-admin-start-prod.md` or `2026-07-24-admin-start-prod` -> look under `.agents/plan/` and append `.md` automatically.
-- Empty -> prefer the **most recently generated or referenced plan file in the current conversation**. If no plan file has appeared in the conversation, use `list_dir` to read `.agents/plan/` and `question` tool to let the user choose a plan file.
+- Empty -> prefer the **most recently generated or referenced plan file in the current conversation**. If no plan file has appeared in the conversation, use the `read` tool (or `bash ls`) to list `.agents/plan/` and `question` tool to let the user choose a plan file.
 
 Stop and notify the user if locating the file fails.
 
 ### 2. Read and understand the plan file
 
-Use `read_file` to read the complete selected plan file.
+Use the `read` tool to read the complete selected plan file.
 
 Output a summary of the current plan in the conversation:
 - File name and path.
@@ -60,12 +60,12 @@ Ask the user to confirm that the current content is understood.
 For each revision request:
 
 1. **Locate the change**: Based on step 2, identify where to modify, such as a Task, code block, or parameter-source list.
-2. **Reread the file**: Before editing, use `read_file` again to ensure the operation uses the latest content.
-3. **Apply the change**: Use `replace_string_in_file` for an exact string replacement.
+2. **Reread the file**: Before editing, use the `read` tool again to ensure the operation uses the latest content.
+3. **Apply the change**: Use the `edit` tool for an exact string replacement.
 4. **Show the change**: Output a summary of the revision, including location and key changes.
 5. **Get user confirmation**: Use `question` tool (yes/no) to ask, "Is this change correct? Would you like to continue revising?"
    - Yes -> continue to the next revision or finish.
-   - No -> use `replace_string_in_file` to undo the revision by restoring the old content.
+   - No -> use the `edit` tool to undo the revision by restoring the old content.
 
 ### 5. Summarize
 
