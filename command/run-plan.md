@@ -3,7 +3,7 @@ description: Execute an existing implementation plan in order and verify each ta
 agent: build
 ---
 
-Use the `run` skill to handle this request.
+Use the `run-plan` skill to handle this request.
 
 Pass the user's input to the skill unchanged:
 
