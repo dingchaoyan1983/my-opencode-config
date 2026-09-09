@@ -15,12 +15,14 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 ## Language
 
-Write the plan in the language specified by the active conversation context and project instructions (for example, `AGENTS.md`, `CLAUDE.md`, or explicit user instructions). If multiple instructions apply, follow the highest-priority instruction and keep the language consistent throughout the plan.
+Before writing the plan, inspect the active conversation context and project instructions (for example, `AGENTS.md`, `CLAUDE.md`, or explicit user instructions) and determine the required language. Do not hard-code a repository-specific language in this skill. If multiple instructions apply, follow the highest-priority instruction and keep the language consistent throughout the plan.
 
 - Translate explanatory prose, headings, task descriptions, rationale, and verification notes into the selected language.
 - Keep code, code comments, file paths, commands, API names, identifiers, package names, and technical literals unchanged unless the project convention requires otherwise.
 - If no language is specified, use the language of the user's latest substantive request and preserve the existing language of nearby project plans when that convention is clear.
 - Do not translate the required plan header's technical labels when doing so would make the plan structure ambiguous; translate surrounding explanatory content while preserving the required fields and formatting.
+
+Before saving the plan, verify that all explanatory prose follows the selected language. Do not leave English prose from the template untranslated, and do not translate code, paths, commands, identifiers, API names, package names, or technical literals.
 
 **Context:** If working in an isolated worktree, it should have been created via the `superpowers:using-git-worktrees` skill at execution time.
 
@@ -187,6 +189,8 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 **2. Placeholder scan:** Search your plan for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
+
+**4. Language consistency:** Does all explanatory prose use the language selected from the active conversation context and project instructions? Is English limited to code, paths, commands, identifiers, API names, package names, and technical literals?
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
 
