@@ -1,0 +1,25 @@
+{
+  // 启用插件的模型列表
+  // 通配符: "*" = 所有, "provider/*" = 指定 provider 所有模型,
+  // "*/model" = 任意 provider 指定模型, "provider/model" = 精确匹配
+  "models": [
+
+  ],
+
+  // MCP 工具名称，固定为 ask-image_ask_image
+  "imageAnalysisTool": "ask-image_ask_image",
+
+  // 自定义提示模板，支持以下变量:
+  //   {imageList}  — 换行分隔的 "- Image N: /path"
+  //   {imageCount} — 图片数量
+  //   {toolName}   — MCP 工具名
+  //   {userText}   — 用户原始文本 (可为空)
+  // 设为 null 使用内置默认模板
+  "promptTemplate": null,
+
+  // 粘贴图片暂存目录，null 使用系统临时目录 + opencode-easy-vision/
+  "tempDir": null,
+
+  // 插件启动时清理超过此小时数的临时文件
+  "cleanupAfterHours": 24
+}

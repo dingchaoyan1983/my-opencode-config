@@ -13,6 +13,7 @@
     }
   },
   "plugin": [
+    "opencode-skill-creator",
     "opencode-easy-vision"
   ],
    "provider": {

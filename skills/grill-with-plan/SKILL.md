@@ -1,6 +1,7 @@
 ---
 name: grill-with-plan
 description: Use when a user has an unclear plan, design, or implementation request and needs its assumptions, tradeoffs, and execution scope clarified before coding.
+disable-model-invocation: true
 license: MIT
 metadata:
   author: dane.ding

@@ -53,33 +53,6 @@ deliverable needs them; split only where a reviewer could meaningfully
 reject one task while approving its neighbor. Each task ends with an
 independently testable deliverable.
 
-## Verification Levels
-
-Choose the **lightest verification that proves the task correct**. A small
-change must not trigger a full build — full builds are slow, and running
-them per-task wastes minutes on every trivial change.
-
-| Task scope | Minimum sufficient verification |
-|---|---|
-| Single-file / type-only / small change | Type check (`npx tsc --noEmit`, or the repo's equivalent) + the targeted unit test if one exists |
-| Multi-file with integration risk | Package-level test command + type check |
-| Final task / cross-package / build-affecting | Full build + full test suite (e.g. `pnpm build`) |
-
-Rules:
-
-- Each task's verification is the minimal set that proves *this task* — not
-  a full regression. Reserve the full suite for the final verification.
-- Full builds (`npm run build`, `pnpm build`) appear only in the plan's
-  final verification step, or when the task genuinely changes build output
-  or configuration. Never put a full build in an ordinary task's steps.
-- Every verification step still states the exact command (`Run: ...`) and
-  expected outcome (`Expected: ...`) — just chosen from the table above.
-- If the package has no test script, fall back to the type check as the
-  minimum verification.
-- When the plan's last task is not itself the final verification, add a
-  final verification step (usually full build + full tests) so the executor
-  knows exactly when the whole suite runs.
-
 ## Bite-Sized Task Granularity
 
 **Each step is one action (2-5 minutes):**
@@ -164,10 +137,6 @@ Expected: PASS
 git add tests/path/test.py src/path/file.py
 git commit -m "feat: add specific feature"
 ```
-
-> Verification should match the task's size — a single-file task uses the
-> lightest check (type check), not a full build. See "Verification Levels"
-> above.
 ````
 
 ## No Placeholders
