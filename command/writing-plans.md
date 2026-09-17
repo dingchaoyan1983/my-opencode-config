@@ -9,4 +9,4 @@ Pass the user's input to the skill unchanged:
 
 $ARGUMENTS
 
-Follow the skill's workflow and hard rules exactly. Complete the plan writing and self-review phases, save the plan, then present the plan path and summary. Offer the plan's two execution options and ask the user which approach to take, then stop. Never execute the plan or modify application code before that choice.
+Follow the skill's workflow and hard rules exactly: complete the plan writing and self-review phases, save the plan, present its path and summary, and wait for explicit user approval. Never execute the plan or modify application code before approval.

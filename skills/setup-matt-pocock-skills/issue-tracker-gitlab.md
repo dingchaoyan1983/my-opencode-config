@@ -14,6 +14,10 @@ Issues and specs for this repo live as GitLab issues. Use the [`glab`](https://g
 
 Infer the repo from `git remote -v`; `glab` does this automatically when run inside a clone.
 
+## Plans
+
+Implementation plans are stored locally at `.scratch/<feature-slug>/plans/<NN>-<slug>.md`. Use the same feature slug for the related GitLab spec and issues, and number plans from `01`.
+
 ## Merge requests as a triage surface
 
 **MRs as a request surface: no.** _(Set to `yes` if this repo treats external merge requests as feature requests; `/triage` reads this flag.)_

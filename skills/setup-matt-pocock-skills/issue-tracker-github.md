@@ -13,6 +13,10 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
+## Plans
+
+Implementation plans are stored locally at `.scratch/<feature-slug>/plans/<NN>-<slug>.md`. Use the same feature slug for the related GitHub spec and issues, and number plans from `01`.
+
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.)_

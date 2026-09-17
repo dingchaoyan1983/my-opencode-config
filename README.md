@@ -8,12 +8,14 @@
 .
 ├── AGENTS.md            # 全局指令：默认使用简体中文交流
 ├── command/
-│   └── grill-with-plan.md  # /grill-with-plan 命令：澄清需求并产出待确认的执行计划
+│   ├── grill-with-plan.md  # /grill-with-plan 命令：澄清需求并产出待确认的执行计划
+│   ├── writing-plans.md    # /writing-plans 命令：生成待用户 review 的实现计划
+│   └── executing-plans.md  # /executing-plans 命令：执行已批准的计划并逐任务检查点暂停
 ├── skills/              # 技能库（superpowers 工作流 + 第三方技能）
 │   ├── grill-with-plan/     # 澄清 → 计划 → 确认 → 执行 的完整工作流
 │   ├── grilling/            # 需求澄清（设计树式追问）
 │   ├── grill-with-docs/     # 澄清并同步产出 ADR / 术语表
-│   ├── writing-plans/       # 编写实现计划（保存到 docs/superpowers/plans/）
+│   ├── writing-plans/       # 编写实现计划（保存到 .scratch/<feature-slug>/plans/）
 │   ├── subagent-driven-development/  # 子代理驱动开发（每任务独立子代理 + 评审）
 │   ├── executing-plans/     # 计划执行（带检查点）
 │   ├── test-driven-development/      # TDD
@@ -37,7 +39,11 @@
 
 澄清一个不明确的实现需求，产出执行计划并等待用户确认后再执行。详见 `command/grill-with-plan.md`。
 
-工作流：`grilling`（澄清）→ `writing-plans`（写计划）→ 用户确认 → `subagent-driven-development` 或 `executing-plans`（执行）。计划文档保存到 `docs/superpowers/plans/`。
+工作流：`grilling`（澄清）→ `writing-plans`（写计划）→ 用户确认 → `subagent-driven-development` 或 `executing-plans`（执行）。本地 Markdown tracker 的计划文档保存到 `.scratch/<feature-slug>/plans/`，与 spec 和 tickets 放在同一个 feature 目录下。
+
+### /implement
+
+实现 ticket 或 spec 时，`implement` 先调用 `writing-plans` 产出包含文件、接口、完整代码示例、测试示例和验证命令的计划，等待用户 review 并明确批准；批准后再调用 `executing-plans`，按任务执行并在每个任务结束时提交 diff、偏差报告和验证结果，等待用户 release，最后交给 `/code-review`。
 
 ## Provider 配置
 
