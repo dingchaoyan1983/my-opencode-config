@@ -1,25 +1,25 @@
 ---
 name: executing-plans
-description: "Execute an approved implementation plan one task at a time with review checkpoints; use when a plan has been approved or when implement hands off its reviewed plan."
+description: "Execute an approved implementation plan task by task, complete each task, resolve its ticket, then pre-commit review, user approval, and batch commit; use when a plan has been approved or when implement hands off its reviewed plan."
 ---
 
 # Executing Plans
 
-Build the work an approved plan describes, one task at a time, with the user reviewing each task before the next one starts.
+Build the work an approved plan describes, one task at a time, keep task todos synchronized, resolve the source ticket after approval, run a pre-commit code review on the complete batch, then let the user review and approve it before committing.
 
-An approved plan is the precondition. If approval is missing, return to `writing-plans` and wait. The checkpoint is part of the workflow: implementation, reviewable diff, deviation report, verification, and user release are one task boundary.
+An approved plan is the precondition. If approval is missing, return to `writing-plans` and wait. Record the current `HEAD` as `base-sha` before editing; it anchors the batch diff and the final review.
 
 ## Process
 
 ### 1. Read and challenge the plan
 
-Read the whole plan and the ticket/spec it argues from. Check that every task can start, every interface lines up, every referenced file exists or is explicitly created, and every verification command is runnable. Raise concerns and wait for the user's answer or a plan amendment before editing.
+Read the whole plan and the ticket/spec it argues from. Capture the source ticket path from the plan's `Ticket:` field and read the applicable tracker instructions. Check that every task can start, every interface lines up, every referenced file exists or is explicitly created, and every verification command is runnable. Raise concerns and wait for the user's answer or a plan amendment before editing.
 
 ### 2. Create task todos
 
-Create one todo per plan task, in plan order, using the task names from the plan. The plan owns the order until the user approves an amendment.
+Create one todo per plan task, in plan order, using the task names from the plan. Keep exactly one active task at a time, mark a task complete immediately after its declared checks pass, and do not leave a completed task in progress while moving to the next one. The plan owns the order until the user approves an amendment.
 
-### 3. Execute one task step by step
+### 3. Execute all tasks sequentially
 
 For each task:
 
@@ -28,6 +28,9 @@ For each task:
 3. Run each step's `Expected:` check and compare the actual result with the expected result.
 4. Drive `/tdd` at the seams agreed by the plan: red test, minimal implementation, green test, then the next vertical slice.
 5. Run the task's declared `Checks:` before calling it complete, including typecheck and focused tests.
+6. Mark the task todo complete immediately after all of its checks pass.
+
+Continue to the next task after the current task's checks pass. Do not pause for user release, commit, or batch review between tasks.
 
 If a step surprises the implementation, record the information and continue only when the plan and the work still describe the same behavior. Use `/codebase-design` when an interface no longer matches the plan's boundary. If the plan and code disagree about what the work is, stop and ask for an amendment.
 
@@ -42,34 +45,40 @@ Compare the finished task with the plan step by step. Record every difference:
 
 State why each deviation was necessary. A real blocker stops the task and goes back to the user; it is never resolved by silently choosing an interpretation.
 
-### 5. Stop at the checkpoint
+### 5. Run code review and present the complete batch for user review
 
-Present the completed task and wait for the user's release. Include:
+After every task is complete, verify that every task todo is marked complete, run the plan-level `Checks:` and the full test suite once, and invoke `/code-review` with `base-sha` as the fixed point so it reviews the complete uncommitted batch. Present the batch and the review report together, then wait for the user's explicit approval. Include:
 
-- The deviation report.
-- The task-scoped diff: `git diff HEAD` when the previous task commit is `HEAD`, or `git diff <previous-task-sha>` for later tasks.
+- A summary of every completed task.
+- The complete deviation report.
+- The complete diff: `git diff base-sha`.
 - Every verification command and its result.
+- The complete `/code-review` report.
 
-Do not commit or start the next task until the user releases this checkpoint. Rework a returned task and present the checkpoint again; if the plan is amended, update the plan before continuing.
+Do not resolve the source ticket or commit until the user approves this reviewed batch. If the user requests changes, rework the affected tasks, return those task todos to in progress, rerun their focused checks and the plan-level checks, run `/code-review` again, and present the batch again. If the plan is amended, update the plan before continuing.
 
-### 6. Commit released tasks
+### 6. Commit the reviewed batch
 
-After release, commit exactly that task using its plan task name in the commit message, then mark its todo complete. The commit is the boundary for the next task's diff.
-
-Run the full test suite once the final task's checks are complete.
-
-### 7. Hand off for final review
-
-After every task is released, committed, and verified, invoke `/code-review` for the complete diff against the project standards and the approved plan/spec.
+After approval and before committing, close the source ticket using the tracker instructions. For the local Markdown tracker, mark every verified ticket acceptance item complete, change its `Status:` to `resolved`, and append a concise `## Resolution` summary; for a wayfinder ticket, use its `## Answer` and map context-pointer rules instead. Keep this ticket update in the same batch as the implementation. Run a final `git diff --check` and confirm no implementation files changed after the review. Then commit the complete batch as one commit using the plan or feature name in the commit message. Do not create task-by-task commits or a separate ticket-status commit.
 
 ## Deviation report template
 
 ```markdown
-## Task <N>: <Task name>
+## Batch: <plan or feature name>
+
+**Completed tasks:**
+
+- Task <N>: <Task name>
+
+**Ticket:**
+
+- Source ticket: `<path>`
+- Status: `resolved`
+- Resolution: <short summary>
 
 **Deviations:**
 
-- `path/to/file.ts` - explain the difference and why it was necessary.
+- Task <N> / `path/to/file.ts` - explain the difference and why it was necessary.
 - Step N changed or skipped - explain the observed result.
 
 **Verification:**
@@ -77,5 +86,5 @@ After every task is released, committed, and verified, invoke `/code-review` for
 - `pnpm typecheck` -> clean
 - `pnpm vitest run path/to/test.ts` -> passed
 
-**Diff:** one-line summary of the files this task touched.
+**Diff:** one-line summary of the complete batch.
 ```
