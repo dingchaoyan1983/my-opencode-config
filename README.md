@@ -8,10 +8,10 @@
 .
 ├── AGENTS.md            # 全局指令：默认使用简体中文交流
 ├── command/
-│   ├── grill-with-plan.md  # /grill-with-plan 命令（当前引用了尚未安装的 skill）
+│   ├── grill-with-plan.md  # /grill-with-plan 命令：先澄清需求，再进入实现流程
 │   ├── writing-plans.md    # /writing-plans 命令：生成待用户 review 的实现计划
 │   └── executing-plans.md  # /executing-plans 命令：执行已批准的计划
-├── skills/                # 28 个工作流与参考 skill
+├── skills/                # 29 个工作流与参考 skill
 ├── opencode.jsonc         # provider、model 与 ask-image MCP 配置
 └── opencode-easy-vision.jsonc # 图片粘贴与视觉分析插件配置
 ```
@@ -20,13 +20,9 @@
 
 ### /grill-with-plan
 
-命令文件仍然存在，但它引用的 `grill-with-plan` skill 当前不在仓库中，因此暂时不要把它作为稳定入口。可使用下面的等价流程：
+该 skill 先调用 `/grill-with-docs` 收敛需求并等待用户确认，再将确认后的需求交给 `/implement`。`/implement` 的计划审批和执行生命周期保持不变。
 
-```text
-/grilling → /writing-plans → 用户明确批准 → /executing-plans
-```
-
-详见 [command/grill-with-plan.md](command/grill-with-plan.md)。
+详见 [command/grill-with-plan.md](command/grill-with-plan.md) 和 [skills/grill-with-plan/SKILL.md](skills/grill-with-plan/SKILL.md)。
 
 ### /writing-plans
 
@@ -66,6 +62,8 @@
 
 `/grill-with-docs`、`/to-spec` 和 `/to-tickets` 应尽量在同一个上下文中完成；每个 `/implement` ticket 从干净上下文开始。
 
+如果希望把需求澄清和实现交接作为一个入口，可使用 `/grill-with-plan`。
+
 ### 其他入口
 
 | 情况 | 入口 | 后续流程 |
@@ -78,7 +76,7 @@
 
 ## Skills 使用指南
 
-以下是当前 `skills/` 目录中的全部 28 个 skill。skill 名称就是调用名，例如 `/tdd`；带有完整说明的链接指向对应的 `SKILL.md`。
+以下是当前 `skills/` 目录中的全部 29 个 skill。skill 名称就是调用名，例如 `/tdd`；带有完整说明的链接指向对应的 `SKILL.md`。
 
 ### 路由、澄清与上下文
 
@@ -88,6 +86,7 @@
 | [grilling](skills/grilling/SKILL.md) | 需求或设计不清晰时使用。按设计树的 frontier 分轮提问，每轮等待回答，直到没有未决策。 |
 | [grill-me](skills/grill-me/SKILL.md) | 没有工作目录、只想澄清想法时使用。调用 `grilling`，不写本地文档。 |
 | [grill-with-docs](skills/grill-with-docs/SKILL.md) | 在仓库中澄清需求时使用。调用 `grilling` 和 `domain-modeling`，同步维护 `CONTEXT.md` 与 ADR。 |
+| [grill-with-plan](skills/grill-with-plan/SKILL.md) | 先调用 `grill-with-docs` 收敛并确认需求，再将确认后的需求交给 `implement`。 |
 | [wait-what](skills/wait-what/SKILL.md) | 用户没有理解上一段说明时使用。用简化技术英语和 `CONTEXT.md` 中的术语重新解释。 |
 | [handoff](skills/handoff/SKILL.md) | 换 harness、目录、同事或分叉任务时使用。把当前上下文写入操作系统临时目录的 handoff Markdown。 |
 | [wayfinder](skills/wayfinder/SKILL.md) | 大型且路线不清晰的工作使用。先定义 destination，再建立决策地图和依赖关系，逐 ticket 解决，不直接实现最终目标。 |

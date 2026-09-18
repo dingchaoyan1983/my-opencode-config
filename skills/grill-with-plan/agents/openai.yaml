@@ -1,0 +1,5 @@
+interface:
+  display_name: "Grill with Plan"
+  short_description: "Clarify requirements, then implement them"
+policy:
+  allow_implicit_invocation: false
