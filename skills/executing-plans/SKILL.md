@@ -7,7 +7,7 @@ description: "Execute an approved implementation plan task by task, complete eac
 
 Build the work an approved plan describes, one task at a time, keep task todos synchronized, resolve the source ticket after approval, run a pre-commit code review on the complete batch, then let the user review and approve it before committing.
 
-An approved plan is the precondition. If approval is missing, return to `writing-plans` and wait. Record the current `HEAD` as `base-sha` before editing; it anchors the batch diff and the final review.
+An approved plan is the precondition. If approval is missing, return to `writing-plans` and wait. Record the current `HEAD` as `base-sha` before editing; it anchors the batch diff and the single pre-commit review.
 
 ## Process
 

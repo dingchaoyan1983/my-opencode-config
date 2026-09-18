@@ -28,16 +28,11 @@ After explicit approval, invoke the `executing-plans` skill with the approved pl
 
 The execution must:
 
-- Read and critically review the approved plan before editing; surface plan concerns before starting.
-- Create one todo per plan task, execute tasks in plan order, and mark each todo complete immediately after that task's declared checks pass.
-- Follow each step's code and test examples, run its `Expected:` check, and run the task's declared typecheck and focused tests.
-- Use `/tdd` at the seams agreed by the plan.
-- After all tasks finish, run the plan-level checks and full test suite, then invoke `/code-review` with the batch base SHA before presenting the complete diff, deviation report, verification output, and review report.
-- Wait for the user's review and approval of that batch. If review rework changes the batch, return the affected todos to in progress, rerun the affected checks, plan-level checks, full test suite, and `/code-review` before asking for approval again.
-- After approval and before committing, mark the source ticket's verified acceptance items complete, change its status to `resolved`, and append the tracker-required resolution. Include that ticket update in the single batch commit; do not create a separate ticket-status commit.
+- Let `executing-plans` own the complete execution lifecycle: plan review, task todos and their completion states, task checks, `/tdd` seams, deviation tracking, plan-level checks, the single pre-commit `/code-review`, source-ticket resolution, user approval, and the single batch commit.
+- Do not repeat any of those lifecycle actions in `implement`, and do not invoke `/code-review` again after `executing-plans` returns.
 
 Only this phase changes application code. If the plan and implementation disagree about the work, stop and ask for a plan amendment instead of choosing an interpretation.
 
 ## Completion
 
-The batch is complete after every task todo is complete, the source ticket is resolved, the user approves the pre-commit `/code-review` report, and the approved implementation plus ticket update are committed to the current branch as one commit, following the batch boundary required by `executing-plans`.
+The batch is complete when `executing-plans` returns after completing its single pre-commit `/code-review`, user approval, source-ticket resolution, and one batch commit. `implement` performs no post-commit review.
