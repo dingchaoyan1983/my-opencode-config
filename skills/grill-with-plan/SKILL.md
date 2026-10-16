@@ -1,6 +1,6 @@
 ---
 name: grill-with-plan
-description: "Clarify an implementation request with documented requirements, then hand the confirmed requirements to the implementation workflow."
+description: "Grill requirements, write a plan, and execute it after approval."
 disable-model-invocation: true
 ---
 
@@ -8,12 +8,15 @@ disable-model-invocation: true
 
 Run these phases in order.
 
-1. Call the Skill tool with `grill-with-docs` and pass the user's request unchanged.
-   - Let it complete its grilling and domain-modeling workflow.
-   - Wait for the user to confirm the shared understanding.
-   - Completion: the user has explicitly confirmed the requirements, and any glossary or ADR changes from the phase are available to the next phase.
+1. Grill and model the domain.
+   - Call the Skill tool for `grilling` and `domain-modeling`, passing the user's request unchanged.
+   - Completion: the user has explicitly confirmed the requirements, and glossary or ADR changes are saved.
 
-2. Call the Skill tool with `implement` and pass the confirmed requirements unchanged.
-   - Carry forward the confirmed scope, decisions, constraints, and document paths as the authoritative implementation input.
-   - Let `implement` own its plan, approval, execution, verification, review, ticket-resolution, and commit lifecycle.
-   - Completion: `implement` has completed its lifecycle or is waiting at its own explicit approval gate. Preserve that gate.
+2. Write the plan.
+   - Call the Skill tool for `writing-plans` with the confirmed scope, decisions, constraints, and document paths as the authoritative input.
+   - Completion: the plan is saved and the user has explicitly approved it. No application code changes before that approval gate.
+
+3. Execute the plan.
+   - Call the Skill tool for `executing-plans` with the approved plan. It owns everything through the batch commit.
+   - If the plan and implementation disagree about the work, stop and ask for a plan amendment.
+   - Completion: `executing-plans` has returned after its batch commit, or is waiting at its own approval gate.
