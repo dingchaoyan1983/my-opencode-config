@@ -10,7 +10,18 @@
         "ASK_IMAGE_BASE_URL": "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
         "ASK_IMAGE_MODEL": "qwen3.7-flash"
       }
-    }
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "playwright-mcp",
+        "--browser",
+        "chrome",
+        "--user-data-dir",
+        "C:\\Users\\daneding\\.playwright-mcp-profile"
+      ],
+      "enabled": true
+    },
   },
   "plugin": [
     "opencode-skill-creator"
