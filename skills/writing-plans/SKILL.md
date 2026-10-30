@@ -48,6 +48,8 @@ Every task includes:
 
 Code examples and test examples are mandatory. A step that says what to do without showing how to do it is not ready for review.
 
+Add a browser verification step (headless Playwright / Puppeteer script asserting on DOM, console, and network, with an `Expected:` line) only when the behavior cannot be proven by unit or component tests, such as multi-step user flows, real rendering or layout, navigation or routing, browser APIs, or frontend-backend integration. Skip it for small changes like copy, class or style tweaks, and logic already covered by a unit or component test, and say in one line why it is skipped.
+
 Use vertical slices where possible: write one failing behavior test, run it red, add the smallest implementation, then run it green before moving to the next slice.
 
 ### 5. Self-review the plan
@@ -57,6 +59,7 @@ Read the plan back against its sources and fix every gap:
 - Every spec decision and acceptance criterion maps to a task.
 - Every task names its files, interfaces, and checks.
 - The final task names the full test suite.
+- Every task whose behavior needs a real browser to prove has a browser verification step with an `Expected:` result; small UI tweaks may skip it with a one-line reason.
 - Names, types, and signatures are identical wherever reused.
 - Every step contains its actual code, test, or command and an expected result.
 - The plan contains no placeholders such as `TBD`, `TODO`, "implement later", "add appropriate error handling", "write tests for the above", or "similar to Task N".

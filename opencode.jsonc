@@ -13,8 +13,7 @@
     }
   },
   "plugin": [
-    "opencode-skill-creator",
-    "opencode-easy-vision"
+    "opencode-skill-creator"
   ],
    "provider": {
    "volcengine-plan": {
